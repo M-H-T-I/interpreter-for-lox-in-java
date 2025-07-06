@@ -79,6 +79,13 @@ public class GenerateAst {
 
         writer.println("    }");
 
+        // implementing the accept method itself (overloading)
+        writer.println();
+        writer.println("    @Override");
+        writer.println("    <R> R accept(Visitor<R> visitor) {");
+        writer.println("        return visitor.visit" + className + baseName + "(this);");
+        writer.println("    }");
+
         //fields
         writer.println();
         for(String field: fields){
