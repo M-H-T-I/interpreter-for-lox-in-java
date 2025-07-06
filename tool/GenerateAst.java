@@ -38,6 +38,7 @@ public class GenerateAst {
         writer.println();
         writer.println("abstract class " + baseName + " {");
 
+        // visitor interface 
         defineVisitor(writer, baseName, types);
 
         // the subclasses
@@ -48,6 +49,10 @@ public class GenerateAst {
             defineType(writer,baseName,className, fields);
 
         }
+
+        // the base accept method
+        writer.println();
+        writer.println("    abstract <R> R accept(Visitor<R> visitor);");
 
 
         writer.println("}");
