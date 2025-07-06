@@ -38,6 +38,8 @@ public class GenerateAst {
         writer.println();
         writer.println("abstract class " + baseName + " {");
 
+        defineVisitor(writer, baseName, types);
+
         // the subclasses
         for (String type: types){
 
@@ -80,6 +82,24 @@ public class GenerateAst {
 
         writer.println("}");
         
+    }
+
+    // creates the Visitor interface
+    private static void defineVisitor(PrintWriter writer, String baseName, List<String> types){
+
+        // head of the interface
+        writer.println("  interface Visitor<R> {");
+
+        // body of the interface
+        for(String type: types){
+            String typeName = type.split(":")[0].trim();
+
+            // Example: Binary visitBinaryExpr(Binary expr);
+            writer.println("    R visit" + typeName + baseName + "(" + typeName + " " + baseName.toLowerCase() + ");");
+        }
+            
+        writer.println("  }");
+
     }
 
 }
