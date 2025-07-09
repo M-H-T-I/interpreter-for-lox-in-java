@@ -5,6 +5,7 @@ import static lox.TokenType.*;
 
 class Parser {
 
+    // thrown when parser cannot provide a proper AST and the interprter needs to stop after it
     private static class ParseError extends RuntimeException{}
     
     private final List<Token> tokens;
@@ -26,7 +27,24 @@ class Parser {
     //expression → equality ;
     // rule for expression coverted to code
     private Expr expression(){
-        return equality();
+        return comma();
+    }
+
+    // comma -> equality ("," equality)* ;
+    private Expr comma(){
+        
+        Expr expr = equality();
+
+        while(match(COMMA)){
+
+            Token operator = previous();
+            Expr right = equality();
+            expr = new Expr.Binary(expr, operator, right);
+
+        }
+
+        return expr;
+
     }
     
     //equality → comparison ( ( "!=" | "==" ) comparison )* ;
