@@ -14,6 +14,15 @@ class Parser {
         this.tokens = tokens;
     } 
 
+
+    Expr parse(){
+        try{
+            return expression();
+        }catch (ParseError error){
+            return null;
+        }
+    }
+
     //expression → equality ;
     // rule for expression coverted to code
     private Expr expression(){
