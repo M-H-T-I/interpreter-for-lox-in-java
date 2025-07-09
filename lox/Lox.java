@@ -66,11 +66,24 @@ public class Lox {
 
     }
 
-    // flags an error?
+    // recieves info of the error and calls report
     static void error(int line, String message){
         report(line,"", message);
     }
 
+    // same function as above; this one is for the parser
+    static void error(Token token, String message){
+
+        if(token.type == TokenType.EOF){
+            report(token.line, " at end", message);
+        } else {
+            report(token.line, "at'" + token.lexeme + "'", message);
+        }
+
+
+    }
+
+    // prints error messages to the console
     private static void report(int line, String where, String message){
 
         System.err.println("[line " + line + "] Error" + where + ": " + message );
