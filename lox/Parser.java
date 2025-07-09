@@ -12,13 +12,13 @@ class Parser {
         this.tokens = tokens;
     } 
 
-    //expression     → equality ;
+    //expression → equality ;
     // rule for expression coverted to code
     private Expr expression(){
         return equality();
     }
     
-    //equality       → comparison ( ( "!=" | "==" ) comparison )* ;
+    //equality → comparison ( ( "!=" | "==" ) comparison )* ;
     // rule for equality coverted to code
     private Expr equality(){
 
@@ -38,7 +38,7 @@ class Parser {
         return expr;
     }
 
-    // comparison     → term ( ( ">" | ">=" | "<" | "<=" ) term )*;
+    // comparison → term ( ( ">" | ">=" | "<" | "<=" ) term )*;
     // converted to java
     private Expr comparison(){
 
@@ -54,6 +54,38 @@ class Parser {
 
         return expr;
 
+    }
+
+    //term → factor ( ( "-" | "+" ) factor )* ;
+    // rule for term: addition, subtraction
+    private Expr term(){
+
+        Expr expr = factor();
+
+        while(match(MINUS, PLUS)){
+
+            Token operator = previous();
+            Expr right = factor();
+            expr = new Expr.Binary(expr, operator, right);
+
+        }
+
+        return expr;
+    }
+
+    //factor → unary ( ( "/" | "*" ) unary )* ;
+    // factor: multiplication and division
+    private Expr factor(){
+
+        Expr expr = unary();
+
+        while(match(SLASH, STAR)){
+            Token operator = previous();
+            Expr right = unary();
+            expr = new Expr.Binary(expr, operator, right);
+        }
+
+        return expr;
     }
 
 
