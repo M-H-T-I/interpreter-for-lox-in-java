@@ -89,6 +89,41 @@ class Parser {
     }
 
 
+    //unary  → ( "!" | "-" ) unary | primary ;
+    private Expr unary(){
+
+        if(match(BANG, MINUS)){
+            Token operator = previous();
+            Expr right = unary();
+            return new Expr.Unary(operator, right);
+        }
+
+        return primary();
+
+    }
+
+    // primary → NUMBER | STRING | "true" | "false" | "nil" | "(" expression ")" ;
+    private Expr primary(){
+
+        if(match(FALSE)) return new Expr.Literal(false);
+        if(match(TRUE)) return new Expr.Literal(true);
+        if(match(NIL)) return new Expr.Literal(null);
+
+        if(match(NUMBER, STRING)){
+            return new Expr.Literal(previous().literal);
+        }
+
+        if(match(LEFT_PAREN)){
+            Expr expr = expression();
+            
+            consume(RIGHT_PAREN, "Expect ')' after expression");
+
+            return new Expr.Grouping(expr);
+        }
+
+    }
+
+
 
     // helper function match: checks to see if any of the given types are present in the current token
     private boolean match(TokenType... types){
@@ -102,6 +137,15 @@ class Parser {
         }
 
         return false;
+
+    }
+
+    // checks to see if an parenthesis is followed by a closing ) 
+    private Token consume(TokenType type, String message){
+
+        if (check(type)) return advance();
+
+        throw error(peek(), message);
 
     }
 
