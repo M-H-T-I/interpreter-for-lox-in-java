@@ -36,5 +36,33 @@ class Parser {
         return expr;
     }
 
+    // helper function match: checks to see if any of the given types are present in the current token
+    private boolean match(TokenType... types){
+
+        for(TokenType type: types){
+            if(check(type)){
+                advance();
+                return true;
+            }
+
+        }
+
+        return false;
+
+    }
+
+    // helper function check: returns true if the current token is of the given type. Unlike match(), it never consumes the token, it only looks at it.
+    private boolean check(TokenType type){
+
+        if(isAtEnd()) return false;
+        return peek().type == type;
+
+    }
+
+    // helper function advance: returns the current token and increments current for the next iteration
+    private Token advance(){
+        if(!isAtEnd()) current++;
+        return previous();
+    }
 
 }
