@@ -12,18 +12,20 @@ class Parser {
         this.tokens = tokens;
     } 
 
+    //expression     → equality ;
     // rule for expression coverted to code
     private Expr expression(){
         return equality();
     }
     
+    //equality       → comparison ( ( "!=" | "==" ) comparison )* ;
     // rule for equality coverted to code
     private Expr equality(){
 
         // maps to the first comparison non-terminal in the grammar rule for equality
         Expr expr = comparison();
 
-        // runs the remaining part of the rule as many time as == or != occur
+        // runs the remaining part of the rule as many time as == or != occur (0 or more)
         while(match(BANG_EQUAL, EQUAL_EQUAL)){
 
             Token operator = previous();
@@ -35,6 +37,26 @@ class Parser {
 
         return expr;
     }
+
+    // comparison     → term ( ( ">" | ">=" | "<" | "<=" ) term )*;
+    // converted to java
+    private Expr comparison(){
+
+        Expr expr = term();
+
+        while (match(GREATER, GREATER_EQUAL, LESS, LESS_EQUAL)){
+
+            Token operator = previous();
+            Expr right = term(); // determining the right term
+            expr = new Expr.Binary(expr, operator, right);
+
+        }
+
+        return expr;
+
+    }
+
+
 
     // helper function match: checks to see if any of the given types are present in the current token
     private boolean match(TokenType... types){
