@@ -65,4 +65,18 @@ class Parser {
         return previous();
     }
 
+    // helper function isAtEnd: checks if wehave run out of tokens to parse
+    private boolean isAtEnd(){
+        return peek().type == EOF;
+    }
+
+    // fetches the token at current in List tokens
+    private Token peek(){
+        return tokens.get(current);
+    }
+
+    // returns the most recently processed token
+    private Token previous(){
+        return tokens.get(current - 1);
+    }
 }
