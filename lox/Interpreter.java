@@ -34,6 +34,8 @@ class Interpreter implements Expr.Visitor<Object> {
                 return !isTruthy(right);
 
             case MINUS:
+
+                checkNumberOperand(expr.operator, right);
                 return -(double)right;
         
         }
@@ -53,20 +55,31 @@ class Interpreter implements Expr.Visitor<Object> {
         switch (expr.operator.type) {
 
             case GREATER:
-              return (double)left > (double)right;
+
+                checkNumberOperands(expr.operator, left, right);
+                return (double)left > (double)right;
+
             case GREATER_EQUAL:
-              return (double)left >= (double)right;
+
+                checkNumberOperands(expr.operator, left, right);
+                return (double)left >= (double)right;
+
             case LESS:
-              return (double)left < (double)right;
+
+                checkNumberOperands(expr.operator, left, right);
+                return (double)left < (double)right;
+
             case LESS_EQUAL:
-              return (double)left <= (double)right;
+                checkNumberOperands(expr.operator, left, right);
+                return (double)left <= (double)right;
 
             
             case BANG_EQUAL: return !isEqual(left,right);
             case EQUAL_EQUAL: return isEqual(left,right);
 
             case MINUS:
-                checkNumberOperand(expr.operator, right);
+            
+                checkNumberOperands(expr.operator, left, right);
                 return (double)left - (double)right;
 
             case PLUS:
@@ -78,12 +91,14 @@ class Interpreter implements Expr.Visitor<Object> {
                     return (String)left + (String)right;
                 }
 
-                break;
+                throw new RuntimeError(expr.operator, "Operands must be two numbers or two strings");
 
             case SLASH:
+                checkNumberOperands(expr.operator, left, right);
                 return (double)left / (double)right;
 
             case STAR:
+                checkNumberOperands(expr.operator, left, right);
                 return (double)left * (double)right;
             
         }
@@ -94,6 +109,7 @@ class Interpreter implements Expr.Visitor<Object> {
 
     // Helper Methods
 
+    // checks the operand 
     private void checkNumberOperand(Token operator, Object operand){
 
         if (operand instanceof Double) return;
@@ -101,6 +117,13 @@ class Interpreter implements Expr.Visitor<Object> {
 
     }
 
+    // checks the number of operands and validates the binary expression
+    private void checkNumberOperands(Token operator, Object left, Object right){
+
+        if(left instanceof Double && right instanceof Double) return;
+        throw new RuntimeError(operator, "Operands must be numbers");
+
+    }
 
     //evaluate: calls the expression's accept method allowing the expression to call the appropriate type of method
     private Object evaluate(Expr expr){
