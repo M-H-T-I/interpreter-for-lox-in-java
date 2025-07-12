@@ -43,7 +43,7 @@ class Interpreter implements Expr.Visitor<Object> {
 
     // Bianry expression conversion
     @Override
-    public Object visitBinaryObject(Expr.Binary expr){
+    public Object visitBinaryExpr(Expr.Binary expr){
 
         Object left = evaluate(expr.left);
         Object right = evaluate(expr.right);
@@ -118,7 +118,5 @@ class Interpreter implements Expr.Visitor<Object> {
         return a.equals(b);
 
     }
-
-
 
 }
