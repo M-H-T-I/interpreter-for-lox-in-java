@@ -10,6 +10,7 @@ class Interpreter implements Expr.Visitor<Object> {
 
     }
 
+
     // Grouping conversion to runtime value:
     @Override 
     public Object visitGroupingExpr(Expr.Grouping expr){
@@ -17,6 +18,7 @@ class Interpreter implements Expr.Visitor<Object> {
         return evaluate(expr.expression);
 
     }
+
 
     // Unary Expression conversion:
     public Object visitUnaryExpr(Expr.Unary expr){
@@ -39,6 +41,54 @@ class Interpreter implements Expr.Visitor<Object> {
     } 
 
 
+    // Bianry expression conversion
+    @Override
+    public Object visitBinaryObject(Expr.Binary expr){
+
+        Object left = evaluate(expr.left);
+        Object right = evaluate(expr.right);
+
+        switch (expr.operator.type) {
+
+            case GREATER:
+              return (double)left > (double)right;
+            case GREATER_EQUAL:
+              return (double)left >= (double)right;
+            case LESS:
+              return (double)left < (double)right;
+            case LESS_EQUAL:
+              return (double)left <= (double)right;
+
+            
+            case BANG_EQUAL: return !isEqual(left,right);
+            case EQUAL_EQUAL: return isEqual(left,right);
+
+            case MINUS:
+                return (double)left - (double)right;
+
+            case PLUS:
+                if (left instanceof Double && right instanceof Double) {
+                    return (double)left + (double)right;
+                } 
+
+                if (left instanceof String && right instanceof String) {
+                    return (String)left + (String)right;
+                }
+
+                break;
+
+            case SLASH:
+                return (double)left / (double)right;
+
+            case STAR:
+                return (double)left * (double)right;
+            
+        }
+
+        //unreachable
+        return null;
+    }
+
     // Helper Methods
 
     //evaluate: calls the expression's accept method allowing the expression to call the appropriate type of method
@@ -57,6 +107,15 @@ class Interpreter implements Expr.Visitor<Object> {
         if (object instanceof Boolean) return (boolean) object;
 
         return true;
+
+    }
+
+    private boolean isEqual(Object a, Object b){
+
+        if (a == null && b == null) return true;
+        if (a==null) return false;
+
+        return a.equals(b);
 
     }
 
