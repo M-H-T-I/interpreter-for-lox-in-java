@@ -1,7 +1,5 @@
 package lox;
 
-import javax.management.RuntimeErrorException;
-
 class Interpreter implements Expr.Visitor<Object> {
 
     // Literal conversion to runtime value:
@@ -48,6 +46,7 @@ class Interpreter implements Expr.Visitor<Object> {
     // Bianry expression conversion
     @Override
     public Object visitBinaryExpr(Expr.Binary expr){
+
 
         Object left = evaluate(expr.left);
         Object right = evaluate(expr.right);
@@ -107,6 +106,17 @@ class Interpreter implements Expr.Visitor<Object> {
         return null;
     }
 
+    void interpreter(Expr expression){
+
+        try{
+            Object value = evaluate(expression);
+            System.out.println(stringify(value));
+        }catch(RuntimeError error){
+            Lox.runtimeError(error);
+        }
+
+    }
+
     // Helper Methods
 
     // checks the operand 
@@ -151,6 +161,28 @@ class Interpreter implements Expr.Visitor<Object> {
 
         return a.equals(b);
 
+    }
+
+    private String stringify(Object object){
+
+        if(object == null) return "nil";
+
+        if (object instanceof Double){
+            
+            String text = object.toString();
+
+            // in case number is 12.0, 34.0, etc.
+            if (text.endsWith(".0")){
+
+                text=text.substring(0, text.length() - 2);
+
+            }
+
+            return text;
+
+        }
+
+        return object.toString();
     }
 
 }
