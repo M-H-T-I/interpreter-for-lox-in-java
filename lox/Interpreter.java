@@ -1,5 +1,7 @@
 package lox;
 
+import javax.management.RuntimeErrorException;
+
 class Interpreter implements Expr.Visitor<Object> {
 
     // Literal conversion to runtime value:
@@ -64,6 +66,7 @@ class Interpreter implements Expr.Visitor<Object> {
             case EQUAL_EQUAL: return isEqual(left,right);
 
             case MINUS:
+                checkNumberOperand(expr.operator, right);
                 return (double)left - (double)right;
 
             case PLUS:
@@ -90,6 +93,14 @@ class Interpreter implements Expr.Visitor<Object> {
     }
 
     // Helper Methods
+
+    private void checkNumberOperand(Token operator, Object operand){
+
+        if (operand instanceof Double) return;
+        throw new RuntimeError(operator, "Operand must be a number.");
+
+    }
+
 
     //evaluate: calls the expression's accept method allowing the expression to call the appropriate type of method
     private Object evaluate(Expr expr){
