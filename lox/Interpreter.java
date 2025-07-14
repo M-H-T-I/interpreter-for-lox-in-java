@@ -1,5 +1,7 @@
 package lox;
 
+import java.util.List;
+
 class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
 
 
@@ -216,4 +218,7 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
         return object.toString();
     }
 
+    private void execute(Stmt stmt){
+        stmt.accept(this);
+    }
 }
