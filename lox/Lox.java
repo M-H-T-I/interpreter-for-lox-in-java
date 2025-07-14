@@ -64,12 +64,13 @@ public class Lox {
 
         //parses the list of tokens
         Parser parser = new Parser(tokens);
-        Expr expression = parser.parse();
+        List<Stmt> statements = parser.parse();
 
         // stop if there is a syntax error
         if (hadError)return;
 
-        interpreter.interpret(expression);
+        // interprets all of the syntax
+        interpreter.interpret(statements);
 
     }
 
