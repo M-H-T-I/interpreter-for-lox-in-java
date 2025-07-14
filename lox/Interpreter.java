@@ -1,6 +1,23 @@
 package lox;
 
-class Interpreter implements Expr.Visitor<Object> {
+class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
+
+
+    // Statements ----------
+    @Override
+    public Void visitExpressionStmt(Stmt.Expression stmt){
+
+        evaluate(stmt.expression);
+        return null;
+
+    }
+
+
+
+
+
+
+    // For expressions ----------------------------
 
     // Literal conversion to runtime value:
     @Override
@@ -105,6 +122,7 @@ class Interpreter implements Expr.Visitor<Object> {
         //unreachable
         return null;
     }
+
 
     void interpreter(Expr expression){
 
