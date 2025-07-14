@@ -32,6 +32,23 @@ class Parser {
     private Expr expression(){
         return equality();
     }
+
+    // statement → exprStmt | printStmt ;
+    // rule for converting statements to their non-terminals
+    private Stmt statement(){
+
+        if (match(PRINT)) return printStatement();
+
+        return expressionStatement();
+
+    }
+
+    // rule for printStatement
+    private Stmt printStatement(){
+        Expr value = expression();
+        consume(SEMICOLON, "Expect ';' after value.");
+        return new Stmt.Print(value);
+    }
     
     //equality → comparison ( ( "!=" | "==" ) comparison )* ;
     // rule for equality coverted to code
