@@ -49,6 +49,12 @@ class Parser {
         consume(SEMICOLON, "Expect ';' after value.");
         return new Stmt.Print(value);
     }
+
+    private Stmt expressionStatement(){
+        Expr expr = expression();
+        consume(SEMICOLON, "Expect ';' after expression.");
+        return new Stmt.Expression(expr);
+    }
     
     //equality → comparison ( ( "!=" | "==" ) comparison )* ;
     // rule for equality coverted to code
