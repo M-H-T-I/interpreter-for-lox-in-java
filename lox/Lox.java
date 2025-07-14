@@ -69,7 +69,7 @@ public class Lox {
         // stop if there is a syntax error
         if (hadError)return;
 
-        interpreter.interpreter(expression);
+        interpreter.interpret(expression);
 
     }
 
