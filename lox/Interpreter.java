@@ -4,6 +4,8 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
 
 
     // Statements ----------
+
+    // expression statements
     @Override
     public Void visitExpressionStmt(Stmt.Expression stmt){
 
@@ -12,7 +14,13 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
 
     }
 
-
+    // print statements
+    @Override
+    public Void visitPrintStmt(Stmt.Print stmt){
+        Object value = evaluate(stmt.expression);
+        System.out.println(stringify(value));
+        return null;
+    }
 
 
 
