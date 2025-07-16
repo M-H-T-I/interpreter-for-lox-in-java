@@ -26,7 +26,7 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
         return null;
     }
 
-
+    //variable statements
     @Override
     public Void visitVarStmt(Stmt.Var stmt){
 
@@ -40,6 +40,13 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
 
     }
 
+    //variable expression
+    @Override
+    public Object visitVariableExpr(Expr.Variable expr){
+
+        return environment.get(expr.name);
+
+    }
 
 
     // For expressions ----------------------------
