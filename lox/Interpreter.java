@@ -4,6 +4,8 @@ import java.util.List;
 
 class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
 
+    // used to store variables and their values
+    private Environment environment = new Environment();
 
     // Statements ----------
 
@@ -24,6 +26,19 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
         return null;
     }
 
+
+    @Override
+    public Void visitVarStmt(Stmt.Var stmt){
+
+        Object value = null;
+        if (stmt.initializer != null){
+            value = evaluate(stmt.initializer);
+        }
+        // every variable gets a nil default value
+        environment.define(stmt.name.lexeme, value);
+        return null;
+
+    }
 
 
 
