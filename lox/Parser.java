@@ -20,12 +20,46 @@ class Parser {
         
         List<Stmt> statements = new ArrayList<>();
         while (!isAtEnd()) {
-            statements.add(statement());
+            statements.add(declaration());
         }
 
         return statements;
 
     }
+
+    //declaration -> varDecl | statement
+    private Stmt declaration(){
+
+        try{
+
+            // if variable declaration
+            if(match(VAR)) return varDeclaration();
+
+            // else return statement
+            return statement();
+
+        } catch (ParseError error){
+            synchronize();
+            return null;
+        }
+
+    }
+
+    // varDecl -> IDENTIFIER = Expression ;
+    private Stmt varDeclaration(){
+
+        Token name = consume(IDENTIFIER, "Expect variable name.");
+        
+        Expr initializer = null;
+        if (match(EQUAL)) {
+            initializer = expression();
+        }
+
+        consume(SEMICOLON, "Expect  ';' after variable declaration.");
+        return new Stmt.Var(name, initializer);
+
+    }
+
 
     //expression → equality ;
     // rule for expression coverted to code
@@ -151,6 +185,10 @@ class Parser {
             return new Expr.Literal(previous().literal);
         }
 
+        if(match(IDENTIFIER)) {
+            return new Expr.Variable(previous());
+        }
+
         if(match(LEFT_PAREN)){
             Expr expr = expression();
 
@@ -180,7 +218,7 @@ class Parser {
 
     }
 
-    // checks to see if an parenthesis is followed by a closing ) 
+    // checks to see if type is present e.g. parenthesis is followed by a closing ) 
     private Token consume(TokenType type, String message){
 
         if (check(type)) return advance();
