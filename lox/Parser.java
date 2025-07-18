@@ -64,7 +64,7 @@ class Parser {
     //expression → equality ;
     // rule for expression coverted to code
     private Expr expression(){
-        return equality();
+        return assignment();
     }
 
     // statement → exprStmt | printStmt ;
@@ -88,6 +88,31 @@ class Parser {
         Expr expr = expression();
         consume(SEMICOLON, "Expect ';' after expression.");
         return new Stmt.Expression(expr);
+    }
+
+    // assignment
+    private Expr assignment(){
+
+        // cascades into the higher precedence expressions
+        Expr expr = equality();
+
+        if(match(EQUAL)){
+
+            Token equals = previous();
+            Expr value = assignment();
+
+            // checking to see if left side is a variable
+            if (expr instanceof Expr.Variable){
+
+                Token name = ((Expr.Variable)expr).name;
+                return new Expr.Assign(name, value);
+            }
+
+            error(equals, "invalid assignment target");
+        }
+
+        return expr;
+
     }
     
     //equality → comparison ( ( "!=" | "==" ) comparison )* ;
