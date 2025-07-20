@@ -61,10 +61,10 @@ class Parser {
 
     }
 
-    // statement → exprStmt | printStmt | block ;
-    // rule for converting statements to their non-terminals
+    // statement → exprStmt | printStmt | block | ifStmt;
     private Stmt statement(){
 
+        if (match(IF)) return ifStatement();
         if (match(PRINT)) return printStatement();
         if (match(LEFT_BRACE)) return new Stmt.Block(block());
 
@@ -72,19 +72,21 @@ class Parser {
 
     }
 
-    // rule for printStatement
+    // printStatement -> print expression ';' 
     private Stmt printStatement(){
         Expr value = expression();
         consume(SEMICOLON, "Expect ';' after value.");
         return new Stmt.Print(value);
     }
 
+    // exprStatement -> expression ';'
     private Stmt expressionStatement(){
         Expr expr = expression();
         consume(SEMICOLON, "Expect ';' after expression.");
         return new Stmt.Expression(expr);
     }
 
+    // block -> {(declaration)*}
     private List<Stmt> block(){
         List<Stmt> statements = new ArrayList<>();
 
@@ -96,7 +98,24 @@ class Parser {
         return statements;
     }
 
-    //expression → assignment;
+    private Stmt ifStatement(){
+
+        consume(LEFT_PAREN, "Expect '(' after 'if'.");
+        Expr condition = expression();
+        consume(RIGHT_PAREN, "Expect ')' after if condition.");
+
+        Stmt thenBranch = statement();
+        Stmt elseBranch = null;
+
+        if( match(ELSE)){
+            elseBranch = statement();
+        }
+
+        return new Stmt.If(condition, thenBranch, elseBranch);
+
+    }
+
+    //expression → assignment ;
     private Expr expression(){
         return assignment();
     }
