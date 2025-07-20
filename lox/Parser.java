@@ -61,7 +61,7 @@ class Parser {
 
     }
 
-    // statement → exprStmt | printStmt ;
+    // statement → exprStmt | printStmt | block ;
     // rule for converting statements to their non-terminals
     private Stmt statement(){
 
@@ -92,7 +92,7 @@ class Parser {
             statements.add(declaration());
         }
 
-        consume(LEFT_BRACE, "Expect '}' after block");
+        consume(RIGHT_BRACE, "Expect '}' after block");
         return statements;
     }
 
