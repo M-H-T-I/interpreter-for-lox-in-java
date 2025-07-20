@@ -30,13 +30,22 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
     @Override
     public Void visitVarStmt(Stmt.Var stmt){
 
+        // every variable gets a nil default value
         Object value = null;
         if (stmt.initializer != null){
             value = evaluate(stmt.initializer);
         }
-        // every variable gets a nil default value
         environment.define(stmt.name.lexeme, value);
         return null;
+
+    }
+
+    @Override
+    public Object visitAssignExpr(Expr.Assign expr){
+
+        Object value = evaluate(expr.value);
+        environment.assign(expr.name, value);
+        return value;
 
     }
 
@@ -240,6 +249,7 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
         return object.toString();
     }
 
+    // calls the accept method of statements
     private void execute(Stmt stmt){
         stmt.accept(this);
     }

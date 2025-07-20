@@ -50,6 +50,7 @@ class Parser {
 
         Token name = consume(IDENTIFIER, "Expect variable name.");
         
+        // default value
         Expr initializer = null;
         if (match(EQUAL)) {
             initializer = expression();
@@ -58,13 +59,6 @@ class Parser {
         consume(SEMICOLON, "Expect  ';' after variable declaration.");
         return new Stmt.Var(name, initializer);
 
-    }
-
-
-    //expression → equality ;
-    // rule for expression coverted to code
-    private Expr expression(){
-        return assignment();
     }
 
     // statement → exprStmt | printStmt ;
@@ -90,7 +84,13 @@ class Parser {
         return new Stmt.Expression(expr);
     }
 
-    // assignment
+    //expression → assignment;
+    private Expr expression(){
+        return assignment();
+    }
+
+
+    // assignment -> equality = assignment
     private Expr assignment(){
 
         // cascades into the higher precedence expressions
@@ -104,7 +104,7 @@ class Parser {
             // checking to see if left side is a variable
             if (expr instanceof Expr.Variable){
 
-                Token name = ((Expr.Variable)expr).name;
+                Token name = ( (Expr.Variable) expr).name;
                 return new Expr.Assign(name, value);
             }
 
@@ -116,7 +116,6 @@ class Parser {
     }
     
     //equality → comparison ( ( "!=" | "==" ) comparison )* ;
-    // rule for equality coverted to code
     private Expr equality(){
 
         // maps to the first comparison non-terminal in the grammar rule for equality
