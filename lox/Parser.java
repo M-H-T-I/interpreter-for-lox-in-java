@@ -98,6 +98,7 @@ class Parser {
         return statements;
     }
 
+    // ifStmt → "if" "(" expression ")" statement ( "else" statement )? ;
     private Stmt ifStatement(){
 
         consume(LEFT_PAREN, "Expect '(' after 'if'.");
@@ -121,11 +122,12 @@ class Parser {
     }
 
 
-    // assignment -> equality = assignment
+    // assignment -> IDENTIFIER "=" assignment | logic_or ;
+
     private Expr assignment(){
 
         // cascades into the higher precedence expressions
-        Expr expr = equality();
+        Expr expr = or();
 
         if(match(EQUAL)){
 
@@ -145,6 +147,37 @@ class Parser {
         return expr;
 
     }
+    // logic_or → logic_and ( "or" logic_and )* ;
+    private Expr or(){
+
+        Expr expr = and();
+        
+        while(match(OR)){
+            Token operator = previous();
+            Expr right = and();
+            expr = new Expr.Logical(expr, operator, right);
+        }
+
+        return expr;
+
+    }
+
+    // logic_and → equality ( "and" equality )* ;
+    private Expr and(){
+        
+        Expr expr = equality();
+
+        while (match(AND)){
+            
+            Token operator = previous();
+            Expr right = equality();
+            expr  = new Expr.Logical(expr, operator, right);
+
+        }
+
+        return expr;
+    }
+
     
     //equality → comparison ( ( "!=" | "==" ) comparison )* ;
     private Expr equality(){
