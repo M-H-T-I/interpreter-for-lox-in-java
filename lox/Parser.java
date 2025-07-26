@@ -2,8 +2,7 @@ package lox;
 
 import java.util.List;
 
-import lox.Stmt.While;
-
+import java.util.Arrays;
 import java.util.ArrayList;
 import static lox.TokenType.*;
 
@@ -48,7 +47,7 @@ class Parser {
 
     }
 
-    // varDecl -> IDENTIFIER = Expression ;
+    // varDecl -> var IDENTIFIER (= Expression) ;
     private Stmt varDeclaration(){
 
         Token name = consume(IDENTIFIER, "Expect variable name.");
@@ -64,9 +63,10 @@ class Parser {
 
     }
 
-    // statement → exprStmt | printStmt | block | ifStmt | whileStmt;
+    // statement → exprStmt | printStmt | block | ifStmt | whileStmt | forStmt;
     private Stmt statement(){
 
+        if (match(FOR)) return forStatement();
         if (match(IF)) return ifStatement();
         if (match(PRINT)) return printStatement();
         if(match(WHILE)) return whileStatement();
@@ -83,6 +83,7 @@ class Parser {
         return new Stmt.Print(value);
     }
 
+    // whileStatement -> 'while (' + expression + ')' + statement; 
     private Stmt whileStatement(){
         
         consume(LEFT_PAREN, "Expect '(' after 'while'.");
@@ -94,6 +95,51 @@ class Parser {
         return new Stmt.While(condition, body);
     }
 
+    private Stmt forStmt() {
+
+        consume(LEFT_PAREN, "Expect '(' after 'for'.");
+
+        // initializer
+        Stmt initializer;
+        if (match(SEMICOLON)){
+            initializer = null;
+        }else if(match(VAR)){
+            initializer = varDeclaration();
+        }else {
+            initializer = expressionStatement();
+        }
+
+        Expr condition = null;
+        if (!check(SEMICOLON)){
+            condition = expression();
+        }
+
+        consume(SEMICOLON, "Expect ';' after loop condition.");
+
+        Expr increment = null;
+        if (!check(RIGHT_PAREN)){
+            increment = expression();
+        }
+
+        consume(RIGHT_PAREN, "Expect ')' after clauses.");
+        
+        Stmt body = statement();
+
+
+        if (increment != null){
+            body = new Stmt.Block(Arrays.asList(body, new Stmt.Expression(increment)));
+        }
+
+        if (condition == null ) condition = new Expr.Literal(true);
+        body = new Stmt.While(condition, body);
+
+        if (initializer != null){
+            body = new Stmt.Block(Arrays.asList(initializer, body));
+        }
+
+        return body;
+    }
+
     // exprStatement -> expression ';'
     private Stmt expressionStatement(){
         Expr expr = expression();
@@ -103,6 +149,7 @@ class Parser {
 
     // block -> {(declaration)*}
     private List<Stmt> block(){
+
         List<Stmt> statements = new ArrayList<>();
 
         while (!check(RIGHT_BRACE) && !isAtEnd()){
@@ -138,7 +185,6 @@ class Parser {
 
 
     // assignment -> IDENTIFIER "=" assignment | logic_or ;
-
     private Expr assignment(){
 
         // cascades into the higher precedence expressions
