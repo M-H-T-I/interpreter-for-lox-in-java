@@ -19,6 +19,19 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
     }
 
     @Override
+    public Void visitWhileStmt(Stmt.While stmt){
+
+        while(isTruthy(evaluate(stmt.condition))){
+            execute(stmt.body);
+        }
+
+        return null;
+    }
+    
+
+
+    // if statements
+    @Override
     public Void visitIfStmt(Stmt.If stmt){
         if (isTruthy(evaluate(stmt.condition))){
             execute(stmt.thenBranch);
@@ -50,12 +63,14 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
 
     }
 
+    // block statements
     @Override 
     public Void visitBlockStmt(Stmt.Block stmt){
         excecuteBlock(stmt.statements, new Environment(environment));
         return null;
     }
 
+    // helper function for block statements
     void excecuteBlock(List<Stmt> statements, Environment environment){
 
         Environment previous = this.environment;
@@ -102,7 +117,8 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
 
     }
 
-    // logical expressions
+    // logical expressions: AND, OR
+    @Override
     public Object visitLogicalExpr(Expr.Logical expr){
         
         Object left = evaluate(expr.left);
