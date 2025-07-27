@@ -110,6 +110,14 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
 
     }
 
+    @Override
+    public Void visitFunctionStmt(Stmt.Function stmt){
+
+        LoxFunction function = new LoxFunction(stmt);
+        environment.define(stmt.name.lexeme , function);
+        return null;
+    }
+
     // For expressions ----------------------------
 
 
@@ -126,7 +134,7 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
         }
 
         if(!(callee instanceof LoxCallable)){
-            throw new RuntimeError(expr.paren, "Can only call functios and classes.");
+            throw new RuntimeError(expr.paren, "Can only call functions and classes.");
         }
 
         LoxCallable function = (LoxCallable)callee;
