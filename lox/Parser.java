@@ -66,7 +66,7 @@ class Parser {
     // statement → exprStmt | printStmt | block | ifStmt | whileStmt | forStmt;
     private Stmt statement(){
 
-        if (match(FOR)) return forStatement();
+        if (match(FOR)) return forStmt();
         if (match(IF)) return ifStatement();
         if (match(PRINT)) return printStatement();
         if(match(WHILE)) return whileStatement();
@@ -310,7 +310,7 @@ class Parser {
     }
 
 
-    //unary  → ( "!" | "-" ) unary | primary ;
+    //unary  → ( "!" | "-" ) unary | call;
     private Expr unary(){
 
         if(match(BANG, MINUS)){
@@ -319,9 +319,53 @@ class Parser {
             return new Expr.Unary(operator, right);
         }
 
-        return primary();
+        return call();
 
     }
+
+    //call → primary ( "(" arguments? ")" )* ;
+    private Expr call(){
+
+        Expr expr = primary();
+
+        while (true){
+            if (match(LEFT_PAREN)){
+                expr = finishCall(expr);
+            } else {
+                break;
+            }
+        }
+
+        return expr;
+
+    }
+
+    // parses the argument list for function call type expressions
+    private Expr finishCall(Expr callee){
+
+        List<Expr> arguments = new ArrayList<>();
+
+        if(!check(RIGHT_PAREN)){
+
+            // Keeps adding arguments to list as long as comma is found
+            do{
+
+                // limiting the max number of arguments to 255
+                if(arguments.size() >= 255 ){
+                    error(peek(), "Cant have more than 255 arguments");
+                }
+
+                arguments.add(expression());
+
+            } while (match(COMMA));
+        }
+
+        Token paren = consume(RIGHT_PAREN, "Expect ')' after arguments.");
+
+        return new Expr.Call(callee, paren, arguments);
+
+    }
+
 
     // primary → NUMBER | STRING | "true" | "false" | "nil" | "(" expression ")" ;
     private Expr primary(){
