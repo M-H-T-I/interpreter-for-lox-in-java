@@ -29,10 +29,13 @@ class Parser {
 
     }
 
-    //declaration -> varDecl | statement
+    //declaration -> varDecl | statement | funDecl;
     private Stmt declaration(){
 
         try{
+
+            // fucntion declaration
+            if( match(FUN)) return function("function");
 
             // if variable declaration
             if(match(VAR)) return varDeclaration();
@@ -46,6 +49,42 @@ class Parser {
         }
 
     }
+
+    // funDecl → "fun" function ;
+    private Stmt.Function function(String kind){
+
+        Token name = consume(IDENTIFIER, "Expect "+ kind + "name.");
+        
+        consume(LEFT_PAREN,"Expect '(' after " + kind + " name.");
+        List<Token> parameters = new ArrayList<>();
+
+        if(!check(RIGHT_PAREN)){
+            do {
+
+                if (parameters.size() > 255){
+                    error(peek(), "Can't have more than 255 parameters");
+                }
+
+                parameters.add(consume(IDENTIFIER,"Expect parameter name."));
+
+            }while (match(COMMA));
+        }
+
+        consume(RIGHT_PAREN, "Expect ')' after parameters.");
+
+        // {body}
+        consume(LEFT_BRACE, "Expect '{' before " + kind + " body.");
+        List<Stmt> body = block(); 
+        
+        return new Stmt.Function(name, parameters, body);
+
+    }
+
+
+
+    // function → IDENTIFIER "(" parameters? ")" block ;
+    // parameters → IDENTIFIER ( "," IDENTIFIER )* ;
+
 
     // varDecl -> var IDENTIFIER (= Expression) ;
     private Stmt varDeclaration(){
@@ -208,6 +247,7 @@ class Parser {
         return expr;
 
     }
+  
     // logic_or → logic_and ( "or" logic_and )* ;
     private Expr or(){
 
@@ -238,7 +278,6 @@ class Parser {
 
         return expr;
     }
-
     
     //equality → comparison ( ( "!=" | "==" ) comparison )* ;
     private Expr equality(){
@@ -260,7 +299,6 @@ class Parser {
     }
 
     // comparison → term ( ( ">" | ">=" | "<" | "<=" ) term )*;
-    // converted to java
     private Expr comparison(){
 
         Expr expr = term();
