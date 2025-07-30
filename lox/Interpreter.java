@@ -118,6 +118,18 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
         return null;
     }
 
+
+    @Override
+    public Void visitReturnStmt(Stmt.Return stmt){
+
+        //default return value
+        Object value = null;
+
+        if(stmt.value != null) value = evaluate(stmt.value);
+
+        throw new Return(value);
+    }
+
     // For expressions ----------------------------
 
 
@@ -151,7 +163,7 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
 
     }
 
-
+    // assignment expression
     @Override
     public Object visitAssignExpr(Expr.Assign expr){
 
