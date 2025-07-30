@@ -51,6 +51,8 @@ class Parser {
     }
 
     // funDecl → "fun" function ;
+    // function → IDENTIFIER "(" parameters? ")" block ;
+    // parameters → IDENTIFIER ( "," IDENTIFIER )* ;
     private Stmt.Function function(String kind){
 
         Token name = consume(IDENTIFIER, "Expect "+ kind + "name.");
@@ -81,11 +83,6 @@ class Parser {
     }
 
 
-
-    // function → IDENTIFIER "(" parameters? ")" block ;
-    // parameters → IDENTIFIER ( "," IDENTIFIER )* ;
-
-
     // varDecl -> var IDENTIFIER (= Expression) ;
     private Stmt varDeclaration(){
 
@@ -105,7 +102,7 @@ class Parser {
     // statement → exprStmt | printStmt | block | ifStmt | whileStmt | forStmt | returnStmt;
     private Stmt statement(){
 
-        if (match(FOR)) return forStmt();
+        if (match(FOR)) return forStatement();
         if (match(IF)) return ifStatement();
         if (match(PRINT)) return printStatement();
         if (match(RETURN)) return returnStatement();
@@ -155,7 +152,7 @@ class Parser {
         return new Stmt.While(condition, body);
     }
 
-    private Stmt forStmt() {
+    private Stmt forStatement() {
 
         consume(LEFT_PAREN, "Expect '(' after 'for'.");
 
@@ -194,6 +191,7 @@ class Parser {
         body = new Stmt.While(condition, body);
 
         if (initializer != null){
+            // a block statement wher ethe variable is efined first followed by the while statement
             body = new Stmt.Block(Arrays.asList(initializer, body));
         }
 

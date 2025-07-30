@@ -49,6 +49,7 @@ class Environment {
 
         if (enclosing != null){
             enclosing.assign(name, value);
+            return;
         }
 
         // throw error if variable is not defined
