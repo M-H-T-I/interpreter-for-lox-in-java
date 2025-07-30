@@ -11,7 +11,7 @@ class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void> {
     private final Interpreter interpreter;
     private final Stack<Map<String,Boolean>> scopes = new Stack<>();
 
-    Resolver(Interpreter interpreter){
+    Resolver(Interpreter interpreter){  
 
         this.interpreter = interpreter;
 
@@ -23,6 +23,17 @@ class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void> {
         beginScope();
         resolve(stmt.statements);
         endScope();
+        return null;
+
+    }
+
+    @Override
+    public Void visitFunctionStmt(Stmt.Function stmt){
+
+        declare(stmt.name);
+        define(stmt.name);
+
+        resolveFunction(stmt);
         return null;
 
     }
@@ -42,6 +53,10 @@ class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void> {
 
     }
 
+
+// Expressions ----------------------------------------------------------------------------
+
+
     @Override 
     public Void visitVariableExpr(Expr.Variable expr){
         if(!scopes.isEmpty() && scopes.peek().get(expr.name.lexeme) == Boolean.FALSE){
@@ -58,7 +73,6 @@ class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void> {
         resolveLocal(expr, expr.value);
         return null;
     }
-
 
     //--------------------------- Helper methods -------------------------
 
@@ -113,6 +127,17 @@ class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void> {
     private void define(Token name){
         if (scopes.isEmpty())return;
         scopes.peek().put(name.lexeme, true);
+    }
+
+    private void resolveFunction(Stmt.Function function){
+
+        beginScope();
+        for (Token param: function.params){
+            declare(param);
+            define(param);
+        }
+        resolve(function.body);
+        endScope();
     }
 
 }
