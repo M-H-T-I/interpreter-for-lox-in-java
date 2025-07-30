@@ -16,4 +16,27 @@ class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void> {
 
     }
 
+    @Override
+    public Void visitBlockStmt(Stmt.Block stmt){
+
+        beginScope();
+        resolve(stmt.statements);
+        endScope();
+        return null;
+
+    }
+
+    //--------------------------- Helper methods -------------------------
+
+    // walks a list of statements and resolves each one: calls resolve method below
+    void resolve(List<Stmt> statements){
+        for (Stmt statement: statements){
+            resolve(statement);
+        }
+    }
+
+    // calls the accept method of statements
+    private void resolve(Stmt stmt){
+        stmt.accept(this);
+    } 
 }
