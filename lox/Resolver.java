@@ -52,6 +52,13 @@ class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void> {
         return null;
     }
 
+    @Override
+    public Void visitAssignExpr(Expr.Assign expr){
+        resolve(expr.value);
+        resolveLocal(expr, expr.value);
+        return null;
+    }
+
 
     //--------------------------- Helper methods -------------------------
 
@@ -79,12 +86,12 @@ class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void> {
         }
     }
 
-    // creates a block scope
+    // pushes scope on to the stack we use to keep track of scopes
     private void beginScope(){
         scopes.push(new HashMap<String, Boolean>());
     }
 
-    //ends (terminates) a scope
+    //ends (terminates) a scope by popping it off of the stack
     private void endScope(){
 
         scopes.pop();
@@ -102,7 +109,7 @@ class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void> {
         scope.put(name.lexeme,false);
     }
 
-    //defines a variable's value; marks its value to true
+    //defines a variable's value; marks its value to true in the map
     private void define(Token name){
         if (scopes.isEmpty())return;
         scopes.peek().put(name.lexeme, true);
