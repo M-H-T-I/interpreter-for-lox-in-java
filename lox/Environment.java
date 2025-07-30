@@ -35,6 +35,7 @@ class Environment {
     // define a variable
     void define(String name, Object value){
 
+        // puts variable key (name) and value in HashMap
         values.put(name, value);
 
     }
@@ -42,11 +43,13 @@ class Environment {
     // assign a value to an existing variable
     void assign(Token name, Object value){
 
+        // check local scope for existance of variable
         if (values.containsKey(name.lexeme)){
             values.put(name.lexeme, value);
             return;
         }
 
+        // if not present in local scope check parent scope
         if (enclosing != null){
             enclosing.assign(name, value);
             return;
