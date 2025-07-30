@@ -10,6 +10,8 @@ class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void> {
     
     private final Interpreter interpreter;
     private final Stack<Map<String,Boolean>> scopes = new Stack<>();
+    private final Map<Expr, Integer> locals = new HashMap<>();
+
 
     Resolver(Interpreter interpreter){  
 
@@ -91,8 +93,8 @@ class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void> {
         return null;
     }
 
+    
     // Expressions ----------------------------------------------------------------------------
-
 
     @Override 
     public Void visitVariableExpr(Expr.Variable expr){
@@ -172,6 +174,11 @@ class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void> {
         stmt.accept(this);
     } 
 
+    // stores resolution info in locals side table
+    void resolve(Expr expr, int depth){
+        locals.put(expr, depth);
+    } 
+
     // sees which scope has the variable if it does exist  
     private void resolveLocal(Expr expr, Token name){
         for (int i = scopes.size() - 1; i >= 0; i--){
@@ -197,7 +204,7 @@ class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void> {
 
     // declares a variable in scope 
     private void declare(Token name){
-        // in global scope hence no need to resolves
+        // in global scope hence no need to resolve
         if(scopes.isEmpty()) return;
 
         // gets the reference to the innermost scope
