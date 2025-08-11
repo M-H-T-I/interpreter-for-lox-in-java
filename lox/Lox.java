@@ -69,6 +69,9 @@ public class Lox {
         // stop if there is a syntax error
         if (hadError)return;
 
+        Resolver resolver = new Resolver(interpreter);
+        resolver.resolve(statements);
+
         // interprets all of the syntax
         interpreter.interpret(statements);
 

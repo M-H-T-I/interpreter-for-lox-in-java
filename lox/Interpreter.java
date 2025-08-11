@@ -1,7 +1,9 @@
 package lox;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
 
@@ -9,6 +11,10 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
 
     // used to store variables and their values
     private Environment environment = globals;
+
+
+    // side table for storing resolution information for the interpreter
+    private final Map<Expr, Integer> locals = new HashMap<>();
 
 
     Interpreter(){
@@ -170,7 +176,6 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
         Object value = evaluate(expr.value);
 
         Integer distance = locals.get(expr);
-
         if(distance != null){
             environment.assignAt(distance,expr.name, value);
         }else {
@@ -185,7 +190,7 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
     @Override
     public Object visitVariableExpr(Expr.Variable expr){
 
-        return lookUpVarible(expr.name, expr);
+        return lookUpVariable(expr.name, expr);
 
     }
 
@@ -331,6 +336,7 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
 
     // Helper Methods
 
+    // looks up the variable and fetches its value
     private Object lookUpVariable(Token name,  Expr expr){
 
         Integer distance = locals.get(expr);
@@ -414,4 +420,10 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
     private void execute(Stmt stmt){
         stmt.accept(this);
     }
+
+    // tells the interpreter how deep the resolvrd variables value is (the scope)
+    void resolve(Expr expr, int depth){
+        locals.put(expr, depth);
+    }
+
 }

@@ -9,9 +9,9 @@ import java.util.Stack;
 class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void> {
     
     private final Interpreter interpreter;
-    private final Stack<Map<String,Boolean>> scopes = new Stack<>();
-    private final Map<Expr, Integer> locals = new HashMap<>();
 
+    // a stacks of Maps (children scopes)
+    private final Stack<Map<String,Boolean>> scopes = new Stack<>();
 
     Resolver(Interpreter interpreter){  
 
@@ -109,7 +109,7 @@ class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void> {
     @Override
     public Void visitAssignExpr(Expr.Assign expr){
         resolve(expr.value);
-        resolveLocal(expr, expr.value);
+        resolveLocal(expr, expr.name);
         return null;
     }
 
@@ -168,16 +168,17 @@ class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void> {
         }
     }
 
-    // calls the accept method of statements
+    // overlaod of resolve for statements
     private void resolve(Stmt stmt){
 
         stmt.accept(this);
     } 
 
-    // stores resolution info in locals side table
-    void resolve(Expr expr, int depth){
-        locals.put(expr, depth);
-    } 
+    // overload of resolve for expressions
+    private void resolve(Expr expr){
+        expr.accept(this);
+    }
+
 
     // sees which scope has the variable if it does exist  
     private void resolveLocal(Expr expr, Token name){
@@ -207,8 +208,14 @@ class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void> {
         // in global scope hence no need to resolve
         if(scopes.isEmpty()) return;
 
-        // gets the reference to the innermost scope
+        // gets the reference to the innermost scope (which is the current scope)
         Map<String, Boolean> scope = scopes.peek();
+
+        // checks if a variable with the same name already exists
+        if (scope.containsKey(name.lexeme)){
+            Lox.error(name, "Already a variable with this name in the scope.");
+        }
+
         // declares the variable in said scope
         scope.put(name.lexeme,false);
     }
