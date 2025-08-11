@@ -72,6 +72,10 @@ public class Lox {
         Resolver resolver = new Resolver(interpreter);
         resolver.resolve(statements);
 
+        // checking if any resolution errors occurred
+        if(hadError) return;
+
+
         // interprets all of the syntax
         interpreter.interpret(statements);
 

@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Stack;
+import java.util.function.Function;
 
 
 class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void> {
@@ -12,6 +13,12 @@ class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void> {
 
     // a stacks of Maps (children scopes)
     private final Stack<Map<String,Boolean>> scopes = new Stack<>();
+    private FunctionType currentFunction = FunctionType.NONE;
+
+    private enum FunctionType{
+        NONE,
+        FUNCTION
+    }
 
     Resolver(Interpreter interpreter){  
 
@@ -35,7 +42,7 @@ class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void> {
         declare(stmt.name);
         define(stmt.name);
 
-        resolveFunction(stmt);
+        resolveFunction(stmt, FunctionType.FUNCTION);
         return null;
 
     }
@@ -79,6 +86,12 @@ class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void> {
 
     @Override
     public Void visitReturnStmt(Stmt.Return stmt){
+        
+        if(currentFunction == FunctionType.NONE){
+            Lox.error(stmt.keyword, "Can't return from toplevel code.");
+        }
+
+        
         if(stmt.value != null){
             resolve(stmt.value);
         }
@@ -226,7 +239,10 @@ class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void> {
         scopes.peek().put(name.lexeme, true);
     }
 
-    private void resolveFunction(Stmt.Function function){
+    private void resolveFunction(Stmt.Function function, FunctionType type){
+
+        FunctionType enclosingFunction = currentFunction;
+        currentFunction = type;
 
         beginScope();
         for (Token param: function.params){
@@ -235,6 +251,7 @@ class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void> {
         }
         resolve(function.body);
         endScope();
+        currentFunction = enclosingFunction;
     }
 
 }
