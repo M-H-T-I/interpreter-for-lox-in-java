@@ -29,7 +29,7 @@ class Parser {
 
     }
 
-    //declaration -> varDecl | statement | funDecl;
+    //declaration -> varDecl | statement | funDecl | classDecl;
     private Stmt declaration(){
 
         try{
@@ -49,6 +49,11 @@ class Parser {
         }
 
     }
+
+    // classDecl → "class" IDENTIFIER "{" function* "}" ;
+    
+
+
 
     // funDecl → "fun" function ;
     // function → IDENTIFIER "(" parameters? ")" block ;

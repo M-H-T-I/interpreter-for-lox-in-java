@@ -4,7 +4,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Stack;
-import java.util.function.Function;
 
 
 class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void> {
@@ -181,7 +180,7 @@ class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void> {
         }
     }
 
-    // overlaod of resolve for statements
+    // overload of resolve for statements
     private void resolve(Stmt stmt){
 
         stmt.accept(this);
