@@ -263,7 +263,7 @@ class Parser {
     }
 
 
-    // assignment -> IDENTIFIER "=" assignment | logic_or ;
+    // assignment -> ( call "." )? IDENTIFIER "=" assignment | logic_or ;
     private Expr assignment(){
 
         // cascades into the higher precedence expressions
