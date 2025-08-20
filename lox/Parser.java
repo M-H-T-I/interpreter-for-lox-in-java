@@ -34,6 +34,9 @@ class Parser {
 
         try{
 
+            // class
+            if (match(CLASS)) return classDeclaration();
+
             // fucntion declaration
             if( match(FUN)) return function("function");
 
@@ -51,7 +54,20 @@ class Parser {
     }
 
     // classDecl → "class" IDENTIFIER "{" function* "}" ;
-    
+    private Stmt classDeclaration(){
+        Token name = consume(IDENTIFIER, "Expect class name.");
+        consume(LEFT_BRACE,"Expect '{' before class body.");
+
+        List<Stmt.Function> methods = new ArrayList<>();
+        while(!check(RIGHT_BRACE) && !isAtEnd()){
+
+            methods.add(function("method"));
+
+        }
+
+        consume(RIGHT_BRACE, "Expect '}' after class body.");
+        return new Stmt.Class(name, methods);
+    }
 
 
 
@@ -393,6 +409,11 @@ class Parser {
         while (true){
             if (match(LEFT_PAREN)){
                 expr = finishCall(expr);
+            }else if(match(DOT)){
+                
+                Token name = consume(IDENTIFIER, "Expect property name after '.'.");
+                expr = new Expr.Get(expr, name);
+
             } else {
                 break;
             }
@@ -402,7 +423,7 @@ class Parser {
 
     }
 
-    // parses the argument list for function call type expressions
+    // parses the argument list for function call type expressions returns an exoression of type Expr.Call
     private Expr finishCall(Expr callee){
 
         List<Expr> arguments = new ArrayList<>();
