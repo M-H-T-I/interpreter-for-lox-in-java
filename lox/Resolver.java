@@ -12,6 +12,8 @@ class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void> {
 
     // a stacks of Maps (children scopes)
     private final Stack<Map<String,Boolean>> scopes = new Stack<>();
+
+    // used to insure that return statements are not allowed in the global scope.
     private FunctionType currentFunction = FunctionType.NONE;
 
     private enum FunctionType{
@@ -31,10 +33,15 @@ class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void> {
         declare(stmt.name);
         define(stmt.name);
 
+        beginScope();
+        scopes.peek().put("this", true);
+
         for (Stmt.Function method: stmt.methods){
             FunctionType declaration = FunctionType.METHOD;
             resolveFunction(method, declaration);
         }
+
+        endScope();
 
         return null;
     }
@@ -173,6 +180,12 @@ class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void> {
         return null;
     }
 
+    @Override
+    public Void visitThisExpr(Expr.This expr){
+        resolveLocal(expr,expr.keyword);
+        return null;
+    }
+
     @Override 
     public Void visitGroupingExpr(Expr.Grouping expr){
         resolve(expr.expression);
@@ -220,7 +233,7 @@ class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void> {
     }
 
 
-    // sees which scope has the variable if it does exist  
+    // sees which scope has the variable if it does exist (only finds and tells interpreter of the depth if the variable if it does exist inside a scope) 
     private void resolveLocal(Expr expr, Token name){
         for (int i = scopes.size() - 1; i >= 0; i--){
             if (scopes.get(i).containsKey(name.lexeme)){
@@ -266,6 +279,7 @@ class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void> {
         scopes.peek().put(name.lexeme, true);
     }
 
+    // resolves the function context we are in as well as saving the previous context. It also determines which scope the parameters are in. 
     private void resolveFunction(Stmt.Function function, FunctionType type){
 
         FunctionType enclosingFunction = currentFunction;
