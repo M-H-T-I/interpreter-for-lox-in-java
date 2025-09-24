@@ -22,6 +22,11 @@ class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void> {
         METHOD
     }
 
+    private enum ClassType{
+        NONE,
+        CLASS
+    }
+
     Resolver(Interpreter interpreter){  
 
         this.interpreter = interpreter;

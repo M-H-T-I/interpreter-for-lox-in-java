@@ -3,7 +3,8 @@ package lox;
 import java.util.HashMap;
 import java.util.Map;
 
-
+//stores variables and their values (for a given scope).
+// also stores the parent environments and refers to them
 class Environment {
     
     private final Map<String, Object> values = new HashMap<>();

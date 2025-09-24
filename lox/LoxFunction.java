@@ -11,6 +11,7 @@ class LoxFunction implements LoxCallable{
         this.closure = closure;
     }
 
+    // the parent scope is bound to the inner scope and used to create a LoxFUnction Object
     LoxFunction bind(LoxInstance instance){
         Environment environment = new Environment(closure);
         environment.define("this", instance);
