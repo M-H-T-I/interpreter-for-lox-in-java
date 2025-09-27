@@ -5,17 +5,19 @@ import java.util.List;
 class LoxFunction implements LoxCallable{
     private final Stmt.Function declaration;
     private final Environment closure;
+    private final boolean isInitializer;
     
-    LoxFunction(Stmt.Function declaration, Environment closure){
+    LoxFunction(Stmt.Function declaration, Environment closure, boolean isInitializer){
         this.declaration = declaration;
         this.closure = closure;
+        this.isInitializer = isInitializer;
     }
 
-    // the parent scope is bound to the inner scope and used to create a LoxFUnction Object
+    // creates a new LoxFunction with "this" bound to the given instance (for methods)
     LoxFunction bind(LoxInstance instance){
         Environment environment = new Environment(closure);
         environment.define("this", instance);
-        return new LoxFunction(declaration, environment);
+        return new LoxFunction(declaration, environment,isInitializer);
     }
 
     @Override 
@@ -31,6 +33,9 @@ class LoxFunction implements LoxCallable{
         try{
             interpreter.executeBlock(declaration.body, environment);
         }catch(Return returnValue){
+
+            if(isInitializer) return closure.getAt(0, "this");
+
             return returnValue.value;
         }
 
