@@ -24,6 +24,7 @@ public class LoxInstance {
         throw new RuntimeError(name, "Undefined property '" + name.lexeme +"'.");
     }
 
+    // puts a new field or updates an existing field
     void set(Token name, Object value){
         fields.put(name.lexeme, value);
     }
