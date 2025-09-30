@@ -463,7 +463,7 @@ class Parser {
     }
 
 
-    // primary → NUMBER | STRING | "true" | "false" | "nil" | "(" expression ")" ;
+    // primary → NUMBER | STRING | "true" | "false" | "nil" | "(" expression ")" | "primary" . IDENTIFIER | "this";
     private Expr primary(){
 
         if(match(FALSE)) return new Expr.Literal(false);
